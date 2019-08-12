@@ -12,7 +12,7 @@ Vue.use(VueApollo);
 
 Vue.config.productionTip = false;
 
-const defaultClient = new ApolloClient({
+export const defaultClient = new ApolloClient({
   uri: "http://localhost:4000/graphql"
 });
 
