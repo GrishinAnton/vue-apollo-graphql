@@ -5,8 +5,10 @@ import AddPost from "./components/Posts/AddPost";
 import Posts from "./components/Posts/Posts";
 
 import Profile from "./components/Auth/Profile";
-import Singin from "./components/Auth/Singin";
-import Singup from "./components/Auth/Singup";
+import Signin from "./components/Auth/Signin";
+import Signup from "./components/Auth/Signup";
+
+import AuthGuard from "./AuthGuard";
 
 Vue.use(Router);
 
@@ -32,17 +34,18 @@ export default new Router({
     {
       path: "/profile",
       name: "Profile",
-      component: Profile
+      component: Profile,
+      beforeEnter: AuthGuard
     },
     {
-      path: "/singin",
-      name: "Singin",
-      component: Singin
+      path: "/signin",
+      name: "Signin",
+      component: Signin
     },
     {
-      path: "/singup",
-      name: "Singup",
-      component: Singup
+      path: "/signup",
+      name: "Signup",
+      component: Signup
     }
   ]
 });

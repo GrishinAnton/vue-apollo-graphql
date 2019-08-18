@@ -1,15 +1,15 @@
 const { ApolloServer, AuthenticationError } = require("apollo-server");
 const mongoose = require("mongoose");
-const fs = require('fs')
-const path = require('path')
-const jwt =  require('jsonwebtoken')
+const fs = require("fs");
+const path = require("path");
+const jwt = require("jsonwebtoken");
 
 require("dotenv").config({ path: "variables.env" });
-const filepath = path.join(__dirname, 'typeDefs.gql')
-const typeDefs = fs.readFileSync(filepath, 'utf-8')
-const resolvers = require('./resolvers')
+const filepath = path.join(__dirname, "typeDefs.gql");
+const typeDefs = fs.readFileSync(filepath, "utf-8");
+const resolvers = require("./resolvers");
 
-const User = require('./models/User')
+const User = require("./models/User");
 const Post = require("./models/Post");
 
 mongoose
@@ -20,21 +20,25 @@ mongoose
   .then(() => console.log("Connect"))
   .catch(err => console.log("err"));
 
-
- const getUser = async token => {
-   if(token) {
+const getUser = async token => {
+  if (token) {
     try {
-      return await jwt.verify(token, process.env.SECRET)
+      return await jwt.verify(token, process.env.SECRET);
     } catch (error) {
-      throw new AuthenticationError('Your session has ended. Please try again.');
-      
+      throw new AuthenticationError(
+        "Your session has ended. Please try again."
+      );
     }
-   }
- } 
+  }
+};
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  formatError: error => ({
+    name: error.name,
+    message: error.message.replace("Context creation failed: ", "")
+  }),
   context: async ({ req }) => {
     const token = req.headers["authorization"];
     return {
@@ -42,7 +46,6 @@ const server = new ApolloServer({
       Post,
       currentUser: await getUser(token)
     };
-    
   }
 });
 

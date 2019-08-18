@@ -19,6 +19,16 @@
             <v-list-item-title v-text="item.title"></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        
+        <v-list-item v-if="user" @click="handleSignoutUser">
+          <v-list-item-icon>
+            <v-icon>mdi-door</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>SingOut</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
       </v-list-item-group>
 
     </v-navigation-drawer>
@@ -47,6 +57,21 @@
           <v-icon left>{{ item.icon }}</v-icon>
           {{ item.title }}
         </v-btn>
+
+        
+        <v-btn text to="/profile" v-if="user">
+          <v-icon class="hidden-sm-only">mdi-account</v-icon>
+          <v-badge right color="blue darken-2">
+            <!-- <span slot="badge">1</span> -->
+            Profile
+          </v-badge>
+        </v-btn>
+
+        <v-btn text v-if="user" @click="handleSignoutUser">
+          <v-icon left class="hidden-sm-only">mdi-door</v-icon>
+          Singout
+        </v-btn>
+
       </v-toolbar-items>
     </v-toolbar>
 
@@ -55,37 +80,86 @@
         <transition name="fade">
           <router-view/>
         </transition>
+        
+        <v-snackbar v-model="authSnackbar" color="success" :timeout="5000" buttom left>
+          <v-icon>mdi-check</v-icon>
+          <h3>You are signed in!</h3>
+        </v-snackbar>
+
+        <v-snackbar v-if="authError" v-model="authErrorSnackbar" color="info" :timeout="5000" buttom left>
+          <v-icon>mdi-cancel</v-icon>
+          <h3>{{ authError.message }}</h3>
+          <v-btn dark text to="/signin">Signin</v-btn>
+        </v-snackbar>
+
       </v-container>
     </main>
   </v-app>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
-      sideNav: false
+      sideNav: false,
+      authSnackbar: false,
+      authErrorSnackbar: false
     };
   },
+  watch: {
+    user(newValue, oldValue){     
+      console.log(newValue, 'newValue');
+      console.log(oldValue, 'oldValue');
+      
+      if(oldValue === null) {
+        this.authSnackbar = true
+      }
+    },
+    authError(value){
+      if(value !== null) {
+        this.authErrorSnackbar = true
+      }
+    },
+  },  
   computed: {
+    ...mapGetters(['authError', 'user']),
     horizontalNavItems() {
-      return [
+      let items = [
         { icon: "mdi-chat", title: "Posts", link: "/posts" },
-        { icon: "mdi-spotify", title: "Sing In", link: "/singin" },
-        { icon: "mdi-account", title: "Sing Up", link: "/singup" }
+        { icon: "mdi-spotify", title: "Sing In", link: "/signin" },
+        { icon: "mdi-account", title: "Sing Up", link: "/signup" }
       ];
+      if(this.user){
+        items = [
+          { icon: "mdi-chat", title: "Posts", link: "/posts" },
+        ]
+      }
+      return items
+
     },
     sideNavItems(){
-      return [
+      let items = [
         { icon: "mdi-chat", title: "Posts", link: "/posts" },
-        { icon: "mdi-spotify", title: "Sing In", link: "/singin" },
-        { icon: "mdi-account", title: "Sing Up", link: "/singup" }
-      ]      
+        { icon: "mdi-spotify", title: "Sing In", link: "/signin" },
+        { icon: "mdi-account", title: "Sing Up", link: "/signup" }
+      ];
+      if(this.user){
+        items = [
+          { icon: "mdi-chat", title: "Posts", link: "/posts" },
+          { icon: "mdi-star", title: "Create Posts", link: "/posts/add" },
+          { icon: "mdi-account", title: "Profile", link: "/profile" },
+        ]
+      }
+      return items      
     }
   },
   methods: {
     toggleSideNav() {
       this.sideNav = !this.sideNav;
+    },
+    handleSignoutUser() {
+      this.$store.dispatch('signoutUser')
     }
   }
 };

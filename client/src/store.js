@@ -11,7 +11,9 @@ export default new Vuex.Store({
   state: {
     posts: [],
     user: null,
-    loading: false
+    loading: false,
+    error: null,
+    authError: null
   },
   mutations: {
     setPosts: (state, payLoad) => {
@@ -22,7 +24,15 @@ export default new Vuex.Store({
     },
     setUser: (state, payLoad) => {
       state.user = payLoad;
-    }
+    },
+    setError(state, payLoad) {
+      state.error = payLoad;
+    },
+    setAuthError: (state, payLoad) => {
+      state.authError = payLoad;
+    },
+    clearUser: state => (state.user = null),
+    clearError: state => (state.error = null)
   },
   actions: {
     getCurrentUser: ({ commit }) => {
@@ -34,7 +44,6 @@ export default new Vuex.Store({
         .then(({ data }) => {
           commit("setLoading", false);
           commit("setUser", data.getCurrentUser);
-          console.log(data.getCurrentUser);
         })
         .catch(err => {
           console.log(err);
@@ -57,23 +66,37 @@ export default new Vuex.Store({
         });
     },
     signinUser: ({ commit }, payLoad) => {
+      commit("clearError");
+      commit("setLoading", true);
+      localStorage.setItem("token", "");
       apolloClient
         .mutate({
           mutation: SIGNIN_USER,
           variables: payLoad
         })
         .then(({ data }) => {
+          commit("setLoading", false);
           localStorage.setItem("token", data.signinUser.token);
           router.go();
         })
         .catch(err => {
+          commit("setError", err);
+          commit("setLoading", false);
           console.log(err);
         });
+    },
+    signoutUser: async ({ commit }) => {
+      commit("clearUser");
+      localStorage.setItem("token", "");
+      await apolloClient.cache.reset();
+      router.push("/").catch(e => console.log(e));
     }
   },
   getters: {
     posts: state => state.posts,
     loading: state => state.loading,
-    user: state => state.user
+    user: state => state.user,
+    error: state => state.error,
+    authError: state => state.authError
   }
 });
