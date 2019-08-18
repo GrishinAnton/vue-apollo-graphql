@@ -50,7 +50,7 @@
 
               <v-layout row>
                 <v-flex xs12>
-                  <v-btn color="accent" :disabled="!isFormValid" type="submit" :loading="loading">
+                  <v-btn color="accent" :disabled="!isFormValid || loading" type="submit" :loading="loading">
                     Signin
                     <template v-slot:loader>
                       <span class="custom-loader">

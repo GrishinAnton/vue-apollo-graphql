@@ -147,7 +147,7 @@ export default {
       if(this.user){
         items = [
           { icon: "mdi-chat", title: "Posts", link: "/posts" },
-          { icon: "mdi-star", title: "Create Posts", link: "/posts/add" },
+          { icon: "mdi-star", title: "Create Posts", link: "/post/add" },
           { icon: "mdi-account", title: "Profile", link: "/profile" },
         ]
       }
