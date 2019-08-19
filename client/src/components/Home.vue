@@ -11,7 +11,12 @@
     </v-layout>
     <v-flex xs12>
       <v-carousel v-if="!loading" v-bind="{ 'cycle': true }">
-        <v-carousel-item v-for="post in posts" :key="post._id" :src="post.imageUrl">
+        <v-carousel-item
+          v-for="post in posts"
+          :key="post._id"
+          :src="post.imageUrl"
+          @click.native="goToPost(post._id)"
+        >
           <h1 class="carousel_title">{{ post.title }}</h1>
         </v-carousel-item>
       </v-carousel>
@@ -20,13 +25,12 @@
 </template>
 
 <script>
-
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex";
 
 export default {
   name: "home",
   computed: {
-    ...mapGetters(['posts', 'loading'])
+    ...mapGetters(["posts", "loading"])
   },
   created() {
     this.hendleGetCarouselPosts();
@@ -34,6 +38,9 @@ export default {
   methods: {
     hendleGetCarouselPosts() {
       this.$store.dispatch("getPosts");
+    },
+    goToPost(postId) {
+      this.$router.push(`/posts/${postId}`);
     }
   }
 };
